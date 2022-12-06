@@ -1,0 +1,18 @@
+{
+  "assembly": [
+    "CollectionOperationKit.dll"
+  ],
+  "css": [],
+  "javascript": [
+    "Resources/CollectionOperationKit.js"
+  ],
+  "image": "Resources/PluginLogo.png",
+  "description": "在命令和服务端命令中，操作数组、对象和字典。通常配合JSON序列化和反序列化命令，用于构建复杂数据结构，实现系统集成。",
+  "name": "对象与集合操作工具",
+  "pluginType": "command",
+  "guid": "CDD2FBD5-794F-4C7F-A483-030352D73C3C",
+  "version": "2.2.0.2",
+  "dependenceVersion": "8.0.100.0",
+  "bundleJavaScript": true,
+  "bundleCSS": true
+}
