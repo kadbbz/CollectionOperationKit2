@@ -39,6 +39,7 @@
                     this.log("Paramater [" + params.OperationParamaterAName + "] should be a number.");
                     return;
                 }
+                paramA = parseInt(paramA);
 
                 inP[paramA] = paramB;
                 this.returnToParam(OutParamaterName, inP);
@@ -55,6 +56,8 @@
                     this.log("Paramater [" + params.OperationParamaterAName + "] should be a number.");
                     return;
                 }
+
+                paramA = parseInt(paramA);
 
                 this.returnToParam(OutParamaterName, inP[paramA]);
                 break;
@@ -152,6 +155,9 @@
                     return;
                 }
 
+                paramA = parseInt(paramA);
+                paramB = parseInt(paramB);
+
                 var result = inP.slice(paramA, paramB);
 
                 this.returnToParam(OutParamaterName, result);
@@ -173,12 +179,13 @@
                     this.log("Paramater [" + params.OperationParamaterBName + "] should be a number.");
                     return;
                 }
+                paramB = parseInt(paramB);
 
-                var current = 0;
-                paramA.forEach((item) => {
-                    inP.splice(paramB + current, 0, item);
-                    current++;
-                });
+                var sub = paramA.concat();
+
+                for (var i1 = 0; i1 < sub.length; i1++) {
+                    inP.splice(paramB + i1, 0, sub[i1]);
+                }
 
                 this.returnToParam(OutParamaterName, inP);
                 break;
@@ -200,6 +207,9 @@
                     this.log("Paramater [" + params.OperationParamaterBName + "] should be a number.");
                     return;
                 }
+
+                paramA = parseInt(paramA);
+                paramB = parseInt(paramB);
 
                 var removedItem = inP.splice(paramA, paramB);
 
@@ -286,10 +296,19 @@ var ClientSideStringMapOp = (function (_super) {
     }
 
     ClientSideStringMapOp.prototype.returnToParam = function (OutParamaterName, data) {
+
+        let obj = Object.create(null);
+        if (data instanceof Map) {
+            for (let [k, v] of data) {
+                obj[k] = v;
+            }
+        }
+
         if (OutParamaterName && OutParamaterName != "") {
+            this.log("The value " + JSON.stringify(obj) +" was set to [" + OutParamaterName+"]");
             Forguncy.CommandHelper.setVariableValue(OutParamaterName, data);
         } else {
-            this.log("The OutParamaterName was not set, the value is: " + JSON.stringify(data));
+            this.log("The OutParamaterName was not set, the value is: " + JSON.stringify(obj));
         }
     };
 
@@ -505,7 +524,7 @@ var ClientSideObjectOp = (function (_super) {
                     return;
                 }
 
-                if (!PropPairs ||  !PropPairs instanceof Array) {
+                if (!PropPairs || !PropPairs instanceof Array) {
                     this.log("Paramater [OperationParamaterPairs] was not set.");
                     return;
                 }
