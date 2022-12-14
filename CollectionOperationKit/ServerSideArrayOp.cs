@@ -229,6 +229,78 @@ namespace CollectionOperationKit
                         returnToParam(dataContext, index);
                         break;
                     }
+                case SupportedOperations.Join:
+                    {
+
+                        ArrayList data = getArrayListParam(dataContext, this.InParamater);
+                        string seprator = getParamValue(dataContext, this.OperationParamaterAName).ToString();
+                        var p = getParamValue(dataContext, this.OperationParamaterBName, false);
+                        string property = null;
+                        if (p != null)
+                        {
+                            property = p.ToString();
+                        }
+
+                        string[] values = new string[data.Count];
+
+                        for (int i = 0; i < data.Count; i++)
+                        {
+
+                            if (string.IsNullOrEmpty(property))
+                            {
+                                values[i] = data[i].ToString();
+                            }
+                            else
+                            {
+                                if (data[i] is Dictionary<string, object> cdata)
+                                {
+
+                                    if (cdata.ContainsKey(property))
+                                    {
+
+                                        if (cdata[property] != null)
+                                        {
+                                            values[i] = cdata[property].ToString();
+                                        }
+                                        else
+                                        {
+                                            values[i] = "null";
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        throw new ArgumentException("[" + this.OperationParamaterBName + "] was not a property of the data at " + i.ToString() + ".");
+                                    }
+                                }
+                                else
+                                {
+                                    var prop = data[i].GetType().GetProperty(property);
+
+                                    if (prop != null)
+                                    {
+                                        var value = prop.GetValue(prop);
+                                        if (value != null)
+                                        {
+
+                                            values[i] = value.ToString();
+                                        }
+                                        else
+                                        {
+                                            values[i] = "null";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new ArgumentException("[" + this.OperationParamaterBName + "] was not a property of the data at " + i.ToString() + ".");
+                                    }
+                                }
+                            }
+                        }
+
+                        returnToParam(dataContext, string.Join(seprator, values));
+                        break;
+                    }
                 default:
                     {
                         break;
@@ -341,6 +413,10 @@ namespace CollectionOperationKit
                     {
                         return setPropertyVisiblity(propertyName, true, true, false);
                     }
+                case SupportedOperations.Join:
+                    {
+                        return setPropertyVisiblity(propertyName, true, true, true);
+                    }
                 default:
                     {
                         return base.GetDesignerPropertyVisible(propertyName, commandScope);
@@ -393,7 +469,9 @@ namespace CollectionOperationKit
             [Description("FromArray：使用【操作参数A】创建高级数组并返回")]
             FromArray,
             [Description("ToArray：将【输入参数】转换为数组并返回")]
-            ToArray
+            ToArray,
+            [Description("Join：使用【操作参数A】作为分隔符，将【输入参数】的【操作参数B】属性（留空则拼接数组元素）拼接成字符串后返回")]
+            Join
         }
     }
 }

@@ -31,15 +31,29 @@ namespace CollectionOperationKit
         {
             if (formula == null)
             {
-                throw new ArgumentException("The parameter/formula was not set.");
+                if (shouldCheckNull)
+                {
+                    throw new ArgumentException("The parameter/formula was not set.");
+                }
+                else
+                {
+                    return null;
+                }
             }
 
             var task = dataContext.EvaluateFormulaAsync(formula);
             task.Wait();
 
-            if (task.Result == null && shouldCheckNull)
+            if (task.Result == null)
             {
-                throw new ArgumentException("[" + formula.ToString() + "] is null.");
+                if (shouldCheckNull)
+                {
+                    throw new ArgumentException("[" + formula.ToString() + "] is null.");
+                }
+                else
+                {
+                    return null;
+                }
             }
 
             return task.Result;

@@ -259,6 +259,33 @@
                 this.returnToParam(OutParamaterName, JSON.stringify(inP));
                 break;
             }
+            case SupportedOperations.Join: {
+
+                if (!Array.isArray(inP)) {
+                    this.log("Paramater [" + params.InParamaterName + "] should be an Array.");
+                    return;
+                }
+
+                var values = [];
+
+                for (var i1 = 0; i1 < inP.length; i1++) {
+                    if (inP[i1]) {
+
+                        if (paramB) {
+                            values.push(inP[i1][paramB]);
+                        } else {
+                            values.push(inP[i1]);
+                        }
+
+                    } else {
+                        values.push("null")
+                    }
+
+                }
+
+                this.returnToParam(OutParamaterName, values.join(paramA));
+                break;
+            }
         }
 
     };
@@ -279,7 +306,8 @@
         IndexOf: 12,
         LastIndexOf: 13,
         FromJSON: 14,
-        ToJSON: 15
+        ToJSON: 15,
+        Join: 16
     }
 
     return ClientSideArrayOp;
@@ -305,7 +333,7 @@ var ClientSideStringMapOp = (function (_super) {
         }
 
         if (OutParamaterName && OutParamaterName != "") {
-            this.log("The value " + JSON.stringify(obj) +" was set to [" + OutParamaterName+"]");
+            this.log("The value " + JSON.stringify(obj) + " was set to [" + OutParamaterName + "]");
             Forguncy.CommandHelper.setVariableValue(OutParamaterName, data);
         } else {
             this.log("The OutParamaterName was not set, the value is: " + JSON.stringify(obj));

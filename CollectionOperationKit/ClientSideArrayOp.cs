@@ -9,7 +9,7 @@ namespace CollectionOperationKit
 {
     [Icon("pack://application:,,,/CollectionOperationKit;component/Resources/ArrayIcon.png")]
     [Category("对象与集合操作")]
-    public class ClientSideArrayOp : Command 
+    public class ClientSideArrayOp : Command
     {
 
         /// <summary>
@@ -34,12 +34,13 @@ namespace CollectionOperationKit
             {
                 if (String.IsNullOrEmpty(OutParamaterName))
                 {
-                    return "数组操作（" + Operation.ToString() + "）" ;
+                    return "数组操作（" + Operation.ToString() + "）";
                 }
-                else {
+                else
+                {
                     return "数组操作（" + Operation.ToString() + "）：" + OutParamaterName;
                 }
-                
+
             }
 
         }
@@ -164,6 +165,10 @@ namespace CollectionOperationKit
                     {
                         return setPropertyVisiblity(propertyName, true, true, false);
                     }
+                case SupportedOperations.Join:
+                    {
+                        return setPropertyVisiblity(propertyName, true, true, true);
+                    }
                 default:
                     {
                         return base.GetDesignerPropertyVisible(propertyName, commandScope);
@@ -206,6 +211,8 @@ namespace CollectionOperationKit
             FromJSON,
             [Description("Stringify：将【输入参数】转换为JSON字符串并返回")]
             ToJSON,
+            [Description("Join：使用【操作参数A】作为分隔符，将【输入参数】的【操作参数B】属性（留空则拼接数组元素）拼接成字符串后返回")]
+            Join
         }
     }
 }
