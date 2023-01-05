@@ -66,13 +66,17 @@ namespace CollectionOperationKit
             {
                 data = (ArrayList)rawData;
             }
-            else if (rawData.GetType() == typeof(Array))
+            else if (rawData.GetType() == typeof(Array)) // 其他数组操作相关插件
             {
                 data.AddRange((Array)rawData);
             }
-            else if (rawData.GetType() == typeof(JArray))
+            else if (rawData.GetType() == typeof(JArray)) // 从JSON序列化过来的数组
             {
                 data.AddRange(((JArray)rawData).ToArray());
+            }
+            else if (rawData.GetType() == typeof(List<Dictionary<string,object>>)) // 设置变量命令从数据库中查询出的多行数据
+            {
+                data.AddRange(((List<Dictionary<string, object>>)rawData).ToArray());
             }
             else
             {
