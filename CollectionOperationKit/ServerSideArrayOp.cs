@@ -66,7 +66,7 @@ namespace CollectionOperationKit
             {
                 data = (ArrayList)rawData;
             }
-            else if (rawData.GetType() == typeof(Array)) // 其他数组操作相关插件
+            else if (rawData.GetType().IsArray) // 其他数组操作相关插件或返回值为各种数组的类型
             {
                 data.AddRange((Array)rawData);
             }
