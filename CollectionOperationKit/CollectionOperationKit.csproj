@@ -10,6 +10,7 @@
 	  <None Remove="Resources\ArrayIcon.png" />
 	  <None Remove="Resources\DictIcon.png" />
 	  <None Remove="Resources\ObjectIcon.png" />
+	  <None Remove="Resources\QueryIcon.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0">
@@ -60,6 +61,7 @@
 	  <Resource Include="Resources\ArrayIcon.png" />
 	  <Resource Include="Resources\DictIcon.png" />
 	  <Resource Include="Resources\ObjectIcon.png" />
+	  <Resource Include="Resources\QueryIcon.png" />
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="&quot;E:\CODE\ForguncyPluginBuilder\bin\ForguncyPluginPackageTool.exe&quot; $(ProjectDir) &quot;C:\Program Files\Forguncy 8&quot; " />

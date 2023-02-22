@@ -48,45 +48,6 @@ namespace CollectionOperationKit
 
         }
 
-        private ArrayList getArrayListParam(IServerCommandExecuteContext dataContext, object formula)
-        {
-            if (formula == null)
-            {
-                throw new ArgumentException("The argument/formula was not set.");
-            }
-
-            var rawData = getParamValue(dataContext, formula);
-
-            ArrayList data = new ArrayList();
-            if (rawData == null)
-            {
-                throw new ArgumentException("[" + formula.ToString() + "] is null.");
-            }
-            if (rawData.GetType() == typeof(ArrayList))
-            {
-                data = (ArrayList)rawData;
-            }
-            else if (rawData.GetType().IsArray) // 其他数组操作相关插件或返回值为各种数组的类型
-            {
-                data.AddRange((Array)rawData);
-            }
-            else if (rawData.GetType() == typeof(JArray)) // 从JSON序列化过来的数组
-            {
-                data.AddRange(((JArray)rawData).ToArray());
-            }
-            else if (rawData.GetType() == typeof(List<Dictionary<string,object>>)) // 设置变量命令从数据库中查询出的多行数据
-            {
-                data.AddRange(((List<Dictionary<string, object>>)rawData).ToArray());
-            }
-            else
-            {
-                throw new ArgumentException("[" + formula.ToString() + "]'s type was " + rawData.GetType().ToString() + ", should be an ArrayList， Array or JArray.");
-            }
-
-            return data;
-
-        }
-
         public ExecuteResult Execute(IServerCommandExecuteContext dataContext)
         {
             switch (this.Operation)
@@ -316,7 +277,7 @@ namespace CollectionOperationKit
         }
 
         [OrderWeight(10)]
-        [DisplayName("数组（输入参数）")]
+        [DisplayName("输入参数（数组）")]
         [FormulaProperty]
         [Description("操作可能不会影响【输入参数】中用到的变量，如需对变量进行修改，可将其填写到【将结果返回到变量】。")]
         public object InParamater { get; set; }

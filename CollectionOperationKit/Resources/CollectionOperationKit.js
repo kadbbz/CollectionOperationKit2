@@ -587,3 +587,195 @@ var ClientSideObjectOp = (function (_super) {
 
 // Key format is "Namespace.ClassName, AssemblyName"
 Forguncy.CommandFactory.registerCommand("CollectionOperationKit.ClientSideObjectOp, CollectionOperationKit", ClientSideObjectOp);
+
+var ClientSideQueryOp = (function (_super) {
+    __extends(ClientSideQueryOp, _super);
+    function ClientSideQueryOp() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+
+    ClientSideQueryOp.prototype.returnToParam = function (OutParamaterName, data) {
+        if (OutParamaterName && OutParamaterName != "") {
+            Forguncy.CommandHelper.setVariableValue(OutParamaterName, data);
+        } else {
+            this.log("OutParamaterName was not set, the value is: " + JSON.stringify(data));
+        }
+    };
+
+    ClientSideQueryOp.prototype.checkWithConditions = function (target, conditions) {
+        if (conditions && conditions instanceof Array) {
+            var me = this;
+
+            for (j = 0; j < conditions.length; j++) {
+                var v = conditions[j];
+
+                var pName = me.evaluateFormula(v.Name);
+                var pValue = me.evaluateFormula(v.Value);
+
+                var value = target[pName];
+
+                switch (v.Op) {
+                    case CalcOp.等于: {
+                        if (value != pValue) {
+                            return false;
+                        }
+                        break;
+                    }
+                    case CalcOp.不等于: {
+                        if (value == pValue) {
+                            return false;
+                        }
+                        break;
+                    }
+                    case CalcOp.包含字符串: {
+                        if (typeof value != 'string' || value.indexOf(pValue) == -1) {
+                            return false;
+                        }
+                        break;
+                    }
+                    case CalcOp.不包含字符串: {
+                        if (typeof value == 'string' && value.indexOf(pValue) != -1) {
+                            return false;
+                        }
+                        break;
+                    }
+                    case CalcOp.开头是: {
+                        if (typeof value != 'string' || value.indexOf(pValue) != 0) {
+                            return false;
+                        }
+                        break;
+                    }
+                    case CalcOp.开头不是: {
+                        if (typeof value == 'string' && value.indexOf(pValue) == 0) {
+                            return false;
+                        }
+                        break;
+                    }
+                    case CalcOp.大于: {
+                        if (value <= pValue) {
+                            return false;
+                        }
+                        break;
+                    }
+                    case CalcOp.不大于: {
+                        if (value > pValue) {
+                            return false;
+                        }
+                        break;
+                    }
+                    case CalcOp.小于: {
+                        if (value >= pValue) {
+                            return false;
+                        }
+                        break;
+                    }
+                    case CalcOp.不小于: {
+                        if (value < pValue) {
+                            return false;
+                        }
+                        break;
+                    }
+                }
+
+            }
+
+            return true;
+        } else {
+            this.log("Query condition was not set. The condition's type is " + typeof inP);
+            return false;
+        }
+    };
+
+    ClientSideQueryOp.prototype.execute = function () {
+        var params = this.CommandParam;
+        var Operation = params.Operation;
+        var PropPairs = params.OperationParamaterPairs;
+        var inP = this.evaluateFormula(params.InParamater);
+        var OutParamaterName = params.OutParamaterName;
+
+        switch (Operation) {
+            case SupportedOperations.Where: {
+                if (!Array.isArray(inP)) {
+                    this.log("Paramater [" + params.InParamater + "] should be an Array: " + typeof inP);
+                    return;
+                }
+                var me = this;
+                var result = [];
+
+                inP.forEach(function (v) {
+                    if (me.checkWithConditions(v, PropPairs)) {
+                        result.push(v);
+                    }
+                });
+
+                this.returnToParam(OutParamaterName, result);
+
+                break;
+            }
+            case SupportedOperations.First: {
+                if (!Array.isArray(inP)) {
+                    this.log("Paramater [" + params.InParamater + "] should be an Array: " + typeof inP);
+                    return;
+                }
+                var result;
+
+                for (i = 0; i < inP.length; i++) {
+                    var v = inP[i];
+                    if (this.checkWithConditions(v, PropPairs)) {
+                        result = v;
+                        break;
+                    }
+                }
+
+                this.returnToParam(OutParamaterName, result);
+
+                break;
+            }
+
+            case SupportedOperations.Last: {
+                if (!Array.isArray(inP)) {
+                    this.log("Paramater [" + params.InParamater + "] should be an Array: " + typeof inP);
+                    return;
+                }
+                var me = this;
+                var result;
+
+                inP.forEach(function (v) {
+                    if (me.checkWithConditions(v, PropPairs)) {
+                        result = v;
+                    }
+                });
+
+                this.returnToParam(OutParamaterName, result);
+
+                break;
+            }
+
+        }
+
+    };
+
+    var SupportedOperations = {
+        Where: 0,
+        First: 1,
+        Last: 2
+    }
+
+    var CalcOp = {
+        等于: 0,
+        不等于: 1,
+        大于: 2,
+        不大于: 3,
+        小于: 4,
+        不小于: 5,
+        包含字符串: 6,
+        不包含字符串: 7,
+        开头是: 8,
+        开头不是: 9
+    }
+
+    return ClientSideQueryOp;
+}(Forguncy.CommandBase));
+
+// Key format is "Namespace.ClassName, AssemblyName"
+Forguncy.CommandFactory.registerCommand("CollectionOperationKit.ClientSideQueryOp, CollectionOperationKit", ClientSideQueryOp);
