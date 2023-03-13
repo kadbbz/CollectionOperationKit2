@@ -20,6 +20,7 @@
         var paramA = this.evaluateFormula(params.OperationParamaterAName);
         var paramB = this.evaluateFormula(params.OperationParamaterBName);
         var OutParamaterName = params.OutParamaterName;
+        var OutParamaterName2 = params.OutParamaterName2;
 
         switch (Operation) {
             case SupportedOperations.Create: {
@@ -118,6 +119,7 @@
                 var result = inP.shift();
 
                 this.returnToParam(OutParamaterName, result);
+                this.returnToParam(OutParamaterName2, inP);
                 break;
             }
             case SupportedOperations.Concat: {
@@ -214,6 +216,12 @@
                 var removedItem = inP.splice(paramA, paramB);
 
                 this.returnToParam(OutParamaterName, removedItem);
+                this.returnToParam(OutParamaterName2, inP);
+                break;
+            }
+            case SupportedOperations.Split: {
+                var result = paramB.split(paramA);
+                this.returnToParam(OutParamaterName, result);
                 break;
             }
             case SupportedOperations.IndexOf: {
@@ -307,7 +315,8 @@
         LastIndexOf: 13,
         FromJSON: 14,
         ToJSON: 15,
-        Join: 16
+        Join: 16,
+        Split: 17
     }
 
     return ClientSideArrayOp;

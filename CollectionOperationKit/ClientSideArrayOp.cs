@@ -72,10 +72,16 @@ namespace CollectionOperationKit
         public object OperationParamaterBName { get; set; }
 
         [DisplayName("将结果返回到变量")]
+        [OrderWeight(999)]
         [ResultToProperty]
         public String OutParamaterName { get; set; }
 
-        private bool setPropertyVisiblity(string propertyName, bool In, bool A, bool B)
+        [OrderWeight(1000)]
+        [DisplayName("将处理后的数组返回到变量")]
+        [ResultToProperty]
+        public String OutParamaterName2 { get; set; }
+
+        private bool setPropertyVisiblity(string propertyName, bool In, bool A, bool B, bool O2 = false)
         {
 
             if (propertyName == nameof(InParamaterName))
@@ -89,6 +95,10 @@ namespace CollectionOperationKit
             else if (propertyName == nameof(OperationParamaterBName))
             {
                 return B;
+            }
+            else if (propertyName == nameof(OutParamaterName2))
+            {
+                return O2;
             }
             else
             {
@@ -143,7 +153,7 @@ namespace CollectionOperationKit
                     }
                 case SupportedOperations.RemoveRange:
                     {
-                        return setPropertyVisiblity(propertyName, true, true, true);
+                        return setPropertyVisiblity(propertyName, true, true, true, true);
                     }
                 case SupportedOperations.Set:
                     {
@@ -151,7 +161,7 @@ namespace CollectionOperationKit
                     }
                 case SupportedOperations.Shift:
                     {
-                        return setPropertyVisiblity(propertyName, true, false, false);
+                        return setPropertyVisiblity(propertyName, true, false, false, true);
                     }
                 case SupportedOperations.Slice:
                     {
@@ -168,6 +178,10 @@ namespace CollectionOperationKit
                 case SupportedOperations.Join:
                     {
                         return setPropertyVisiblity(propertyName, true, true, true);
+                    }
+                case SupportedOperations.Split:
+                    {
+                        return setPropertyVisiblity(propertyName, false, true, true);
                     }
                 default:
                     {
@@ -212,7 +226,9 @@ namespace CollectionOperationKit
             [Description("Stringify：将【输入参数】转换为JSON字符串并返回")]
             ToJSON,
             [Description("Join：使用【操作参数A】作为分隔符，将【输入参数】的【操作参数B】属性（留空则拼接数组元素）拼接成字符串后返回")]
-            Join
+            Join,
+            [Description("Split：使用【操作参数A】作为分隔符，将字符串类型的【输入参数B】分割成数组后返回")]
+            Split
         }
     }
 }

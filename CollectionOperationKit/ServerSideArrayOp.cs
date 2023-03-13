@@ -140,6 +140,7 @@ namespace CollectionOperationKit
                         var first = data[0];
                         data.RemoveAt(0);
                         returnToParam(dataContext, first);
+                        returnToParam2(dataContext, data);
                         break;
                     }
                 case SupportedOperations.Concat:
@@ -171,13 +172,14 @@ namespace CollectionOperationKit
                 case SupportedOperations.RemoveRange:
                     {
                         ArrayList data = getArrayListParam(dataContext, this.InParamater);
-                        int index = int.Parse(getParamValue(dataContext, this.OperationParamaterBName).ToString());
-                        int count = int.Parse(getParamValue(dataContext, this.OperationParamaterAName).ToString());
+                        int index = int.Parse(getParamValue(dataContext, this.OperationParamaterAName).ToString());
+                        int count = int.Parse(getParamValue(dataContext, this.OperationParamaterBName).ToString());
 
                         Array sub = data.GetRange(index, count).ToArray();
                         data.RemoveRange(index, count);
 
                         returnToParam(dataContext, sub);
+                        returnToParam2(dataContext, data);
                         break;
                     }
                 case SupportedOperations.IndexOf:
@@ -192,6 +194,15 @@ namespace CollectionOperationKit
                         ArrayList data = getArrayListParam(dataContext, this.InParamater);
                         int index = data.LastIndexOf(getParamValue(dataContext, this.OperationParamaterAName));
                         returnToParam(dataContext, index);
+                        break;
+                    }
+                case SupportedOperations.Split:
+                    {
+                        string input = getParamValue(dataContext, this.OperationParamaterBName, true).ToString();
+                        string spliter = getParamValue(dataContext, this.OperationParamaterAName, true).ToString();
+
+                        string[] result = input.Split(spliter.ToCharArray());
+                        returnToParam(dataContext, result);
                         break;
                     }
                 case SupportedOperations.Join:
@@ -288,7 +299,7 @@ namespace CollectionOperationKit
         [SearchableProperty]
         public SupportedOperations Operation { get; set; }
 
-        private bool setPropertyVisiblity(string propertyName, bool In, bool A, bool B)
+        private bool setPropertyVisiblity(string propertyName, bool In, bool A, bool B, bool O2 = false)
         {
 
             if (propertyName == nameof(InParamater))
@@ -302,6 +313,10 @@ namespace CollectionOperationKit
             else if (propertyName == nameof(OperationParamaterBName))
             {
                 return B;
+            }
+            else if (propertyName == nameof(OutParamaterName2))
+            {
+                return O2;
             }
             else
             {
@@ -356,7 +371,7 @@ namespace CollectionOperationKit
                     }
                 case SupportedOperations.RemoveRange:
                     {
-                        return setPropertyVisiblity(propertyName, true, true, true);
+                        return setPropertyVisiblity(propertyName, true, true, true, true);
                     }
                 case SupportedOperations.Set:
                     {
@@ -364,7 +379,7 @@ namespace CollectionOperationKit
                     }
                 case SupportedOperations.Shift:
                     {
-                        return setPropertyVisiblity(propertyName, true, false, false);
+                        return setPropertyVisiblity(propertyName, true, false, false, true);
                     }
                 case SupportedOperations.Slice:
                     {
@@ -381,6 +396,10 @@ namespace CollectionOperationKit
                 case SupportedOperations.Join:
                     {
                         return setPropertyVisiblity(propertyName, true, true, true);
+                    }
+                case SupportedOperations.Split:
+                    {
+                        return setPropertyVisiblity(propertyName, false, true, true);
                     }
                 default:
                     {
@@ -400,6 +419,19 @@ namespace CollectionOperationKit
         [FormulaProperty]
         public object OperationParamaterBName { get; set; }
 
+        [OrderWeight(1000)]
+        [DisplayName("将处理后的数组返回到变量")]
+        [ResultToProperty]
+        public String OutParamaterName2 { get; set; }
+
+        protected void returnToParam2(IServerCommandExecuteContext dataContext, object data)
+        {
+
+            if (!string.IsNullOrEmpty(OutParamaterName2))
+            {
+                dataContext.Parameters[OutParamaterName2] = data;
+            }
+        }
 
         public enum SupportedOperations
         {
@@ -415,9 +447,9 @@ namespace CollectionOperationKit
             Push,
             [Description("Pop：返回【输入参数】的最后一个元素，并将其移除")]
             Pop,
-            [Description("Unshift：将【操作参数A】添加到【输入参数】的开头")]
+            [Description("Unshift：将【操作参数A】添加到【输入参数】的开头并返回")]
             Unshift,
-            [Description("Shift：返回【输入参数】的第一个元素，并将其移除")]
+            [Description("Shift：分别返回【输入参数】的第一个元素，以及将其移除后的数组")]
             Shift,
             [Description("Concat：返回一个新数组，顺次包含【输入参数】和【操作参数A】的所有元素")]
             Concat,
@@ -425,7 +457,7 @@ namespace CollectionOperationKit
             Slice,
             [Description("InsertRange：类似splice，将【操作参数A】的所有元素添加到【输入参数】的【操作参数B】位置")]
             InsertRange,
-            [Description("RemoveRange：类似splice，返回【输入参数】中从【操作参数A】位置开始的【操作参数B】个元素，并将其移除")]
+            [Description("RemoveRange：类似splice，分别返回【输入参数】中从【操作参数A】位置开始的【操作参数B】个元素，以及将其移除后的数组")]
             RemoveRange,
             [Description("IndexOf：返回【操作参数A】在【输入参数】中第一次出现的位置")]
             IndexOf,
@@ -436,7 +468,9 @@ namespace CollectionOperationKit
             [Description("ToArray：将【输入参数】转换为数组并返回")]
             ToArray,
             [Description("Join：使用【操作参数A】作为分隔符，将【输入参数】的【操作参数B】属性（留空则拼接数组元素）拼接成字符串后返回")]
-            Join
+            Join,
+            [Description("Split：使用【操作参数A】作为分隔符，将字符串类型的【输入参数B】分割成数组后返回")]
+            Split
         }
     }
 }
