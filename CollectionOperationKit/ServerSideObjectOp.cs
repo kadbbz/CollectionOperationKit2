@@ -181,7 +181,7 @@ namespace CollectionOperationKit
                             value = getParamValue(dataContext, this.OperationParamaterValue, false);
                         }
 
-                        returnToParam(dataContext, setObjectProperty(input, name, value));
+                        returnToParam(dataContext, ServerSideHelpers.SetObjectProperty(input, name, value));
 
                         break;
                     }
@@ -200,11 +200,11 @@ namespace CollectionOperationKit
                             {
                                 if (pair.Value == null) // 不设置该属性时，等同于直接置空
                                 {
-                                    input = setObjectProperty(input, getParamValue(dataContext, pair.Name).ToString(), null);
+                                    input = ServerSideHelpers.SetObjectProperty(input, getParamValue(dataContext, pair.Name).ToString(), null);
                                 }
                                 else
                                 {
-                                    input = setObjectProperty(input, getParamValue(dataContext, pair.Name).ToString(), getParamValue(dataContext, pair.Value, false));
+                                    input = ServerSideHelpers.SetObjectProperty(input, getParamValue(dataContext, pair.Name).ToString(), getParamValue(dataContext, pair.Value, false));
                                 }
                             }
 
@@ -231,55 +231,7 @@ namespace CollectionOperationKit
 
         }
 
-        private object setObjectProperty(object input, string name, object value)
-        {
-            if (input is IDictionary<string, object> dic)
-            {
-                // 使用命令创建的，直接写入
-                if (dic.ContainsKey(name))
-                {
-                    dic[name] = value;
-                }
-                else
-                {
-                    dic.Add(name, value);
-                }
-
-                return input;
-            }
-            else if (input is JObject jObj)
-            {
-                // 从JSON反序列化回来的，先转成和使用命令创建的一样的类型
-                var inputObj = jObj.ToDictionary();
-
-                if (inputObj.ContainsKey(name))
-                {
-                    inputObj[name] = value;
-                }
-                else
-                {
-                    inputObj.Add(name, value);
-                }
-
-                return inputObj;
-            }
-            else
-            {
-                // 内置类型不支持增加属性，但可以尝试写入
-                var prop = input.GetType().GetProperty(name);
-                if (prop == null)
-                {
-                    throw new NotSupportedException("AppendProperty is NOT supported for the [" + InParamater + "], it's neither a Dictionary<string,object> created by Huozige command or a JObject deserialized from JSON.");
-                }
-                else
-                {
-                    prop.SetValue(input, value);
-                }
-
-                return input;
-            }
-
-        }
+        
 
         private bool setPropertyVisiblity(string propertyName, bool In, bool N, bool V, bool M = false)
         {

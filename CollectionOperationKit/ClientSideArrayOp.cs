@@ -183,6 +183,14 @@ namespace CollectionOperationKit
                     {
                         return setPropertyVisiblity(propertyName, false, true, true);
                     }
+                case SupportedOperations.Select:
+                    {
+                        return setPropertyVisiblity(propertyName, true, true, false);
+                    }
+                case SupportedOperations.Distinct:
+                    {
+                        return setPropertyVisiblity(propertyName, true, true, false);
+                    }
                 default:
                     {
                         return base.GetDesignerPropertyVisible(propertyName, commandScope);
@@ -228,7 +236,11 @@ namespace CollectionOperationKit
             [Description("Join：使用【操作参数A】作为分隔符，将【输入参数】的【操作参数B】属性（留空则拼接数组元素）拼接成字符串后返回")]
             Join,
             [Description("Split：使用【操作参数A】作为分隔符，将字符串类型的【输入参数B】分割成数组后返回")]
-            Split
+            Split,
+            [Description("Select：提取【输入参数】中每个元素里名为【操作参数A】的属性，将其作为一个新的数组返回")]
+            Select,
+            [Description("Distinct：以名为【操作参数A】的属性为基准，将【输入参数】去除空值和重复值后，作为新数组返回")]
+            Distinct
         }
     }
 }

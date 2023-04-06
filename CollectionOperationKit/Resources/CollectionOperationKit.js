@@ -294,6 +294,52 @@
                 this.returnToParam(OutParamaterName, values.join(paramA));
                 break;
             }
+            case SupportedOperations.Select: {
+                if (!Array.isArray(inP)) {
+                    this.log("Paramater [" + params.InParamaterName + "] should be an Array.");
+                    return;
+                }
+
+                if (!paramA) {
+                    this.log("Paramater [" + params.OperationParamaterAName + "] should not be null.");
+                    return;
+                }
+
+                var values = [];
+
+                inP.map(function (obj) {
+                    if (obj && obj[paramA]) {
+                        values.push(obj[paramA]);
+                    }
+                });
+
+                this.returnToParam(OutParamaterName, values);
+                break;
+            }
+            case SupportedOperations.Distinct: {
+                if (!Array.isArray(inP)) {
+                    this.log("Paramater [" + params.InParamaterName + "] should be an Array.");
+                    return;
+                }
+
+                if (!paramA) {
+                    this.log("Paramater [" + params.OperationParamaterAName + "] should not be null.");
+                    return;
+                }
+
+                var keys = [];
+                var values = [];
+
+                inP.map(function (obj) {
+                    if (obj && obj[paramA] && keys.indexOf(obj[paramA]) < 0) {
+                        keys.push(obj[paramA]);
+                        values.push(obj);
+                    }
+                });
+
+                this.returnToParam(OutParamaterName, values);
+                break;
+            }
         }
 
     };
@@ -316,7 +362,10 @@
         FromJSON: 14,
         ToJSON: 15,
         Join: 16,
-        Split: 17
+        Split: 17,
+        Select: 18,
+        Distinct: 19
+
     }
 
     return ClientSideArrayOp;

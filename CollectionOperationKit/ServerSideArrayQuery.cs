@@ -132,47 +132,6 @@ namespace CollectionOperationKit
             return new ExecuteResult();
         }
 
-        private object getPropertyValue(object target, string propName)
-        {
-            if (target is Dictionary<string, object> targetD)
-            {
-                // 活字格内置功能生成的对象
-                if (targetD.ContainsKey(propName))
-                {
-                    return targetD[propName];
-                }
-                else
-                {
-                    throw new ArgumentException("Dictionary<string, object> did not have key: " + propName);
-                }
-            }
-            else if (target is JObject targetJ)
-            {
-                // 反序列化的对象
-                var p = targetJ.Property(propName);
-                if (p != null)
-                {
-                    return targetJ[propName].ToString(); // 统一处理成字符串
-                }
-                else
-                {
-                    throw new ArgumentException("JObject did not have property: " + propName);
-                }
-            }
-            else
-            {
-                // 其他对象
-                var p = target.GetType().GetProperty(propName);
-                if (p != null)
-                {
-                    return p.GetValue(target);
-                }
-                else
-                {
-                    throw new ArgumentException("object (" + target.GetType().Name + ") did not have property: " + propName);
-                }
-            }
-        }
 
         private bool checkWithConditions(IServerCommandExecuteContext dataContext, object candidate)
         {
@@ -180,18 +139,19 @@ namespace CollectionOperationKit
 
             foreach (QueryConditionObject qco in this.OperationParamaterPairs)
             {
-                var value = getPropertyValue(candidate, getParamValue(dataContext, qco.Name).ToString());
+                var value = ServerSideHelpers.GetObjectProperty(candidate, getParamValue(dataContext, qco.Name).ToString());
 
                 if (value is string || value is int || value is double || value is float || value is DateTime || value is bool || value is byte || value is long || value is short)
                 {
-                    string vs = value.ToString();
-                    string condition = getParamValue(dataContext, qco.Value).ToString();
+                    string valueString = value.ToString();
+                    object condition = getParamValue(dataContext, qco.Value);
+                    string conditionString = condition.ToString();
 
                     switch (qco.Op)
                     {
                         case CollectionOperationKit.Operation.等于:
                             {
-                                if (vs != condition)
+                                if (!ServerSideHelpers.IsEqual(value, condition))
                                 {
                                     return false;
                                 }
@@ -199,7 +159,7 @@ namespace CollectionOperationKit
                             }
                         case CollectionOperationKit.Operation.不等于:
                             {
-                                if (vs == condition)
+                                if (ServerSideHelpers.IsEqual(value, condition))
                                 {
                                     return false;
                                 }
@@ -208,7 +168,7 @@ namespace CollectionOperationKit
                         case CollectionOperationKit.Operation.包含字符串:
                             {
 
-                                if (!(value is string) || !vs.Contains(condition))
+                                if (!(value is string) || !valueString.Contains(conditionString))
                                 {
                                     return false;
                                 }
@@ -217,7 +177,7 @@ namespace CollectionOperationKit
                         case CollectionOperationKit.Operation.不包含字符串:
                             {
                                 
-                                if (value is string && vs.Contains(condition))
+                                if (value is string && valueString.Contains(conditionString))
                                 {
                                     return false;
                                 }
@@ -226,7 +186,7 @@ namespace CollectionOperationKit
                         case CollectionOperationKit.Operation.开头是:
                             {
 
-                                if (!(value is string) || !vs.StartsWith(condition))
+                                if (!(value is string) || !valueString.StartsWith(conditionString))
                                 {
                                     return false;
                                 }
@@ -235,7 +195,7 @@ namespace CollectionOperationKit
                         case CollectionOperationKit.Operation.开头不是:
                             {
 
-                                if (value is string && vs.StartsWith(condition))
+                                if (value is string && valueString.StartsWith(conditionString))
                                 {
                                     return false;
                                 }
@@ -250,7 +210,7 @@ namespace CollectionOperationKit
                                 if (value is int || value is double || value is float || value is long || value is short)
                                 {
                                     var v = double.Parse(value.ToString());
-                                    var c = double.Parse(condition);
+                                    var c = double.Parse(conditionString);
                                     if (v <= c)
                                     {
                                         return false;
@@ -259,7 +219,7 @@ namespace CollectionOperationKit
                                 else if (value is DateTime)
                                 {
                                     var v = DateTime.Parse(value.ToString());
-                                    var c = DateTime.Parse(condition);
+                                    var c = DateTime.Parse(conditionString);
                                     
                                     if (v <= c)
                                     {
@@ -280,7 +240,7 @@ namespace CollectionOperationKit
                                 if (value is int || value is double || value is float || value is long || value is short)
                                 {
                                     var v = double.Parse(value.ToString());
-                                    var c = double.Parse(condition);
+                                    var c = double.Parse(conditionString);
                                     if (v > c)
                                     {
                                         return false;
@@ -289,7 +249,7 @@ namespace CollectionOperationKit
                                 else if (value is DateTime)
                                 {
                                     var v = DateTime.Parse(value.ToString());
-                                    var c = DateTime.Parse(condition);
+                                    var c = DateTime.Parse(conditionString);
                                     if (v > c)
                                     {
                                         return false;
@@ -310,7 +270,7 @@ namespace CollectionOperationKit
                                 if (value is int || value is double || value is float || value is long || value is short)
                                 {
                                     var v = double.Parse(value.ToString());
-                                    var c = double.Parse(condition);
+                                    var c = double.Parse(conditionString);
                                     if (v >= c)
                                     {
                                         return false;
@@ -319,7 +279,7 @@ namespace CollectionOperationKit
                                 else if (value is DateTime)
                                 {
                                     var v = DateTime.Parse(value.ToString());
-                                    var c = DateTime.Parse(condition);
+                                    var c = DateTime.Parse(conditionString);
                                     if (v >= c)
                                     {
                                         return false;
@@ -340,7 +300,7 @@ namespace CollectionOperationKit
                                 if (value is int || value is double || value is float || value is long || value is short)
                                 {
                                     var v = double.Parse(value.ToString());
-                                    var c = double.Parse(condition);
+                                    var c = double.Parse(conditionString);
                                     if (v < c)
                                     {
                                         return false;
@@ -349,7 +309,7 @@ namespace CollectionOperationKit
                                 else if (value is DateTime)
                                 {
                                     var v = DateTime.Parse(value.ToString());
-                                    var c = DateTime.Parse(condition);
+                                    var c = DateTime.Parse(conditionString);
                                     if (v < c)
                                     {
                                         return false;
