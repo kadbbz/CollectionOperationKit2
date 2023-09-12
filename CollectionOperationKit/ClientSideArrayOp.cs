@@ -239,7 +239,7 @@ namespace CollectionOperationKit
             Split,
             [Description("Select：提取【输入参数】中每个元素里名为【操作参数A】的属性，将其作为一个新的数组返回")]
             Select,
-            [Description("Distinct：以名为【操作参数A】的属性为基准，将【输入参数】去除空值和重复值后，作为新数组返回")]
+            [Description("Distinct：以名为【操作参数A】的属性为基准（留空则直接比较数组元素），将【输入参数】去除空值和重复值后，作为新数组返回")]
             Distinct
         }
     }

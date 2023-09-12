@@ -277,7 +277,7 @@
                 var values = [];
 
                 for (var i1 = 0; i1 < inP.length; i1++) {
-                    if (inP[i1]) {
+                    if (inP[i1] != undefined && inP[i1] != null) {
 
                         if (paramB) {
                             values.push(inP[i1][paramB]);
@@ -321,23 +321,31 @@
                     this.log("Paramater [" + params.InParamaterName + "] should be an Array.");
                     return;
                 }
-
-                if (!paramA) {
-                    this.log("Paramater [" + params.OperationParamaterAName + "] should not be null.");
-                    return;
-                }
-
-                var keys = [];
+                var taken = [];
                 var values = [];
 
-                inP.map(function (obj) {
-                    if (obj && obj[paramA] && keys.indexOf(obj[paramA]) < 0) {
-                        keys.push(obj[paramA]);
-                        values.push(obj);
-                    }
-                });
+                if (!paramA) {
+
+                    inP.map(function (obj) {
+                        if (obj && obj[paramA] && taken.indexOf(obj[paramA]) < 0) {
+                            taken.push(obj[paramA]);
+                            values.push(obj);
+                        }
+                    });
+
+                } else {
+
+                    inP.map(function (obj) {
+                        if (obj && taken.indexOf(JSON.stringify(obj)) < 0) {
+                            taken.push(JSON.stringify(obj));
+                            values.push(obj);
+                        }
+                    });
+
+                }
 
                 this.returnToParam(OutParamaterName, values);
+
                 break;
             }
         }
