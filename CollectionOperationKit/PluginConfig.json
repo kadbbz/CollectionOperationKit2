@@ -11,7 +11,7 @@
   "name": "对象与集合操作工具",
   "pluginType": "command",
   "guid": "CDD2FBD5-794F-4C7F-A483-030352D73C3C",
-  "version": "2.7.1.0",
+  "version": "2.7.2.0",
   "dependenceVersion": "8.0.0.0",
   "bundleJavaScript": true,
   "bundleCSS": true

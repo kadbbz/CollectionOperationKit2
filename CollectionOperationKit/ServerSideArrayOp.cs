@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 
 namespace CollectionOperationKit
 {
@@ -231,9 +232,17 @@ namespace CollectionOperationKit
                 case SupportedOperations.Distinct:
                     {
                         ArrayList data = getArrayListParam(dataContext, this.InParamater);
-                        string propName = getParamValue(dataContext, this.OperationParamaterAName).ToString();
+                        var propName = getParamValue(dataContext, this.OperationParamaterAName, false);
+                        ArrayList result = new ArrayList();
 
-                        ArrayList result = new ArrayList(data.ToArray().Distinct<object>(new ObjectPropertyComparer(propName)).ToArray());
+                        if (propName != null)
+                        {
+                            result = new ArrayList(data.ToArray().Distinct<object>(new ObjectPropertyComparer(propName.ToString())).ToArray());
+                        }
+                        else
+                        {
+                            result = new ArrayList(data.ToArray().Distinct<object>(new ObjectComparer()).ToArray());
+                        }
 
                         returnToParam(dataContext, result);
                         break;
@@ -518,6 +527,27 @@ namespace CollectionOperationKit
             [Description("Distinct：以名为【操作参数A】的属性为基准（留空则直接比较数组元素），将【输入参数】去除空值和重复值后，作为新数组返回")]
             Distinct
         }
+
+        public class ObjectComparer : IEqualityComparer<object>
+        {
+            bool IEqualityComparer<object>.Equals(object x, object y)
+            {
+                return ServerSideHelpers.IsEqual(x, y);
+            }
+
+            int IEqualityComparer<object>.GetHashCode(object obj)
+            {
+                if (obj == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return obj.GetHashCode();
+                }
+            }
+        }
+
 
         public class ObjectPropertyComparer : IEqualityComparer<object>
         {
