@@ -71,7 +71,7 @@ namespace CollectionOperationKit
         public object OperationParamaterKey { get; set; }
 
         [DisplayName("值")]
-        [FormulaProperty]
+        [FormulaProperty(AcceptsReturn = true)]
         public object OperationParamaterValue { get; set; }
 
         [DisplayName("将结果返回到变量")]

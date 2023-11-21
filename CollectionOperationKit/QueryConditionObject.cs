@@ -19,7 +19,7 @@ namespace CollectionOperationKit
         public Operation Op { get; set; } = Operation.等于;
 
         [DisplayName("值")]
-        [FormulaProperty]
+        [FormulaProperty(AcceptsReturn = true)]
         public object Value { get; set; }
     }
 

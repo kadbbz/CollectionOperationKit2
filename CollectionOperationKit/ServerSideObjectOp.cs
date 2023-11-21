@@ -313,7 +313,7 @@ namespace CollectionOperationKit
 
         [OrderWeight(102)]
         [DisplayName("属性值")]
-        [FormulaProperty]
+        [FormulaProperty(AcceptsReturn = true)]
         public object OperationParamaterValue { get; set; }
 
         [OrderWeight(103)]

@@ -15,7 +15,7 @@ namespace CollectionOperationKit
         public object Name { get; set; }
 
         [DisplayName("值")]
-        [FormulaProperty]
+        [FormulaProperty(AcceptsReturn = true)]
         public object Value { get; set; }
     }
 }

@@ -197,7 +197,7 @@ namespace CollectionOperationKit
 
         [OrderWeight(102)]
         [DisplayName("值")]
-        [FormulaProperty]
+        [FormulaProperty(AcceptsReturn = true)]
         public object OperationParamaterValue { get; set; }
 
         private bool setPropertyVisiblity(string propertyName, bool In, bool K, bool V)
