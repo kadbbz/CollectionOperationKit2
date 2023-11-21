@@ -215,7 +215,7 @@ namespace CollectionOperationKit
                         string input = getParamValue(dataContext, this.OperationParamaterBName, true).ToString();
                         string spliter = getParamValue(dataContext, this.OperationParamaterAName, true).ToString();
 
-                        string[] result = input.Split(spliter.ToCharArray());
+                        string[] result = input.Split(spliter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                         returnToParam(dataContext, result);
                         break;
                     }
@@ -461,12 +461,12 @@ namespace CollectionOperationKit
 
         [OrderWeight(101)]
         [DisplayName("操作参数A")]
-        [FormulaProperty]
+        [FormulaProperty(AcceptsReturn = true)]
         public object OperationParamaterAName { get; set; }
 
         [OrderWeight(102)]
         [DisplayName("操作参数B")]
-        [FormulaProperty]
+        [FormulaProperty(AcceptsReturn = true)]
         public object OperationParamaterBName { get; set; }
 
         [OrderWeight(1000)]

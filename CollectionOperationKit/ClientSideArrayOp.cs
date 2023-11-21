@@ -64,11 +64,11 @@ namespace CollectionOperationKit
         public object InParamaterName { get; set; }
 
         [DisplayName("操作参数A")]
-        [FormulaProperty]
+        [FormulaProperty(AcceptsReturn = true)]
         public object OperationParamaterAName { get; set; }
 
         [DisplayName("操作参数B")]
-        [FormulaProperty]
+        [FormulaProperty(AcceptsReturn = true)]
         public object OperationParamaterBName { get; set; }
 
         [DisplayName("将结果返回到变量")]
