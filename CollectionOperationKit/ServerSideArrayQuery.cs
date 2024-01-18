@@ -14,6 +14,8 @@ namespace CollectionOperationKit
     public class ServerSideArrayQuery : BaseServerCommand, ICommandExecutableInServerSide
     {
 
+        const string NULL_MASK = "%null%";
+
         /// <summary>
         /// 在设计器中展示的插件名称
         /// </summary>
@@ -54,6 +56,7 @@ namespace CollectionOperationKit
 
         [OrderWeight(103)]
         [DisplayName("点击设置查询条件")]
+        [Description("查询条件为AND关系，即所有条件全部满足才能返回；如需使用null作为查询条件，请用%null%代替。")]
         [ListProperty]
         public List<QueryConditionObject> OperationParamaterPairs { get; set; }
 
@@ -141,6 +144,30 @@ namespace CollectionOperationKit
             {
                 var value = ServerSideHelpers.GetObjectProperty(candidate, getParamValue(dataContext, qco.Name).ToString());
 
+                // 先处理null，需要支持活字格的%null%
+                if (value == null)
+                {
+                    object condition = getParamValue(dataContext, qco.Value);
+
+                    switch (qco.Op)
+                    {
+                        case CollectionOperationKit.Operation.等于:
+                            {
+                                return condition == null || condition.ToString().ToLower() == NULL_MASK;
+                            }
+                        case CollectionOperationKit.Operation.不等于:
+                            {
+                                return !(condition == null || condition.ToString().ToLower() == NULL_MASK);
+                            }
+                        default:
+                            {
+                                //null仅支持判等，其他类型统一按照false处理。
+                                return false; 
+                            }
+                    }
+                }
+
+                // 再处理值类型
                 if (value is string || value is int || value is double || value is float || value is DateTime || value is bool || value is byte || value is long || value is short)
                 {
                     string valueString = value.ToString();
@@ -151,88 +178,82 @@ namespace CollectionOperationKit
                     {
                         case CollectionOperationKit.Operation.等于:
                             {
-                                if (!ServerSideHelpers.IsEqual(value, condition))
-                                {
-                                    return false;
-                                }
-                                break;
+                                return ServerSideHelpers.IsEqual(value, condition);
                             }
                         case CollectionOperationKit.Operation.不等于:
                             {
-                                if (ServerSideHelpers.IsEqual(value, condition))
-                                {
-                                    return false;
-                                }
-                                break;
+                                return !ServerSideHelpers.IsEqual(value, condition);
                             }
                         case CollectionOperationKit.Operation.包含字符串:
                             {
-
-                                if (!(value is string) || !valueString.Contains(conditionString))
-                                {
+                                if (value is string) {
+                                    return valueString.Contains(conditionString);
+                                } else {
+                                    // 仅支持字符串
                                     return false;
                                 }
-                                break;
                             }
                         case CollectionOperationKit.Operation.不包含字符串:
                             {
-                                
-                                if (value is string && valueString.Contains(conditionString))
+                                if (value is string)
                                 {
+                                    return !valueString.Contains(conditionString);
+                                }
+                                else
+                                {
+                                    // 仅支持字符串
                                     return false;
                                 }
-                                break;
                             }
                         case CollectionOperationKit.Operation.开头是:
                             {
-
-                                if (!(value is string) || !valueString.StartsWith(conditionString))
+                                if (value is string)
                                 {
+                                    return valueString.StartsWith(conditionString);
+                                }
+                                else
+                                {
+                                    // 仅支持字符串
                                     return false;
                                 }
-                                break;
+                                
                             }
                         case CollectionOperationKit.Operation.开头不是:
                             {
-
-                                if (value is string && valueString.StartsWith(conditionString))
+                                if (value is string)
                                 {
+                                    return !valueString.StartsWith(conditionString);
+                                }
+                                else
+                                {
+                                    // 仅支持字符串
                                     return false;
                                 }
-                                break;
                             }
                         case CollectionOperationKit.Operation.大于:
                             {
-                                //dataContext.Log.AppendLine("Property type: " + value.GetType().ToString());
-                                //dataContext.Log.AppendLine("Property value: " + value.ToString());
-                                //dataContext.Log.AppendLine("Condition value: " + condition);
-
                                 if (value is int || value is double || value is float || value is long || value is short)
                                 {
                                     var v = double.Parse(value.ToString());
                                     var c = double.Parse(conditionString);
-                                    if (v <= c)
-                                    {
-                                        return false;
-                                    }
+                                    
+                                    return (v > c);
+                                    
                                 }
                                 else if (value is DateTime)
                                 {
                                     var v = DateTime.Parse(value.ToString());
                                     var c = DateTime.Parse(conditionString);
-                                    
-                                    if (v <= c)
-                                    {
-                                        return false;
-                                    }
+
+                                    return (v > c);
                                 }
                                 else
                                 {
+                                    // 仅支持数值和日期
                                     return false;
 
                                 }
 
-                                break;
                             }
                         case CollectionOperationKit.Operation.不大于:
                             {
@@ -241,28 +262,23 @@ namespace CollectionOperationKit
                                 {
                                     var v = double.Parse(value.ToString());
                                     var c = double.Parse(conditionString);
-                                    if (v > c)
-                                    {
-                                        return false;
-                                    }
+
+                                    return (v <= c);
+
                                 }
                                 else if (value is DateTime)
                                 {
                                     var v = DateTime.Parse(value.ToString());
                                     var c = DateTime.Parse(conditionString);
-                                    if (v > c)
-                                    {
-                                        return false;
-                                    }
+
+                                    return (v <= c);
                                 }
                                 else
                                 {
-                                    // 不支持比较，符合断言
-                                    return true;
+                                    // 仅支持数值和日期
+                                    return false;
 
                                 }
-
-                                break;
                             }
                         case CollectionOperationKit.Operation.小于:
                             {
@@ -271,28 +287,23 @@ namespace CollectionOperationKit
                                 {
                                     var v = double.Parse(value.ToString());
                                     var c = double.Parse(conditionString);
-                                    if (v >= c)
-                                    {
-                                        return false;
-                                    }
+
+                                    return (v < c);
+
                                 }
                                 else if (value is DateTime)
                                 {
                                     var v = DateTime.Parse(value.ToString());
                                     var c = DateTime.Parse(conditionString);
-                                    if (v >= c)
-                                    {
-                                        return false;
-                                    }
+
+                                    return (v < c);
                                 }
                                 else
                                 {
-                                    // 不支持比较
+                                    // 仅支持数值和日期
                                     return false;
 
                                 }
-
-                                break;
                             }
                         case CollectionOperationKit.Operation.不小于:
                             {
@@ -301,34 +312,30 @@ namespace CollectionOperationKit
                                 {
                                     var v = double.Parse(value.ToString());
                                     var c = double.Parse(conditionString);
-                                    if (v < c)
-                                    {
-                                        return false;
-                                    }
+
+                                    return (v >= c);
+
                                 }
                                 else if (value is DateTime)
                                 {
                                     var v = DateTime.Parse(value.ToString());
                                     var c = DateTime.Parse(conditionString);
-                                    if (v < c)
-                                    {
-                                        return false;
-                                    }
+
+                                    return (v >= c);
                                 }
                                 else
                                 {
-                                    // 不支持比较
-                                    return true;
+                                    // 仅支持数值和日期
+                                    return false;
 
                                 }
-
-                                break;
                             }
                     }
                 }
                 else
                 {
-                    throw new ArgumentException("The property is not the basic type: " + value.GetType().Name);
+                    // 不支持其他类型，统一按照false处理。
+                    return false;
                 }
             }
 

@@ -682,64 +682,50 @@ var ClientSideQueryOp = (function (_super) {
 
                 switch (v.Op) {
                     case CalcOp.等于: {
-                        if (value != pValue) {
-                            return false;
-                        }
-                        break;
+                        return (value == pValue || (value == null && pValue == "%null%"));
                     }
                     case CalcOp.不等于: {
-                        if (value == pValue) {
-                            return false;
-                        }
-                        break;
+                        return !(value == pValue || (value == null && pValue == "%null%"));
                     }
                     case CalcOp.包含字符串: {
-                        if (typeof value != 'string' || value.indexOf(pValue) == -1) {
+                        if (typeof value == 'string') {
+                            return value.indexOf(pValue) >= 0;
+                        } else {
                             return false;
                         }
-                        break;
                     }
                     case CalcOp.不包含字符串: {
-                        if (typeof value == 'string' && value.indexOf(pValue) != -1) {
+                        if (typeof value == 'string') {
+                            return value.indexOf(pValue) == -1;
+                        } else {
                             return false;
                         }
-                        break;
                     }
                     case CalcOp.开头是: {
-                        if (typeof value != 'string' || value.indexOf(pValue) != 0) {
+                        if (typeof value == 'string') {
+                            return value.indexOf(pValue) == 0;
+                        } else {
                             return false;
                         }
-                        break;
                     }
                     case CalcOp.开头不是: {
-                        if (typeof value == 'string' && value.indexOf(pValue) == 0) {
+                        if (typeof value == 'string') {
+                            return value.indexOf(pValue) != 0;
+                        } else {
                             return false;
                         }
-                        break;
                     }
                     case CalcOp.大于: {
-                        if (value <= pValue) {
-                            return false;
-                        }
-                        break;
+                        return (value > pValue);
                     }
                     case CalcOp.不大于: {
-                        if (value > pValue) {
-                            return false;
-                        }
-                        break;
+                        return !(value > pValue);
                     }
                     case CalcOp.小于: {
-                        if (value >= pValue) {
-                            return false;
-                        }
-                        break;
+                        return (value < pValue);
                     }
                     case CalcOp.不小于: {
-                        if (value < pValue) {
-                            return false;
-                        }
-                        break;
+                        return !(value < pValue);
                     }
                 }
 

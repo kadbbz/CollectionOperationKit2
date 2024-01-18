@@ -64,6 +64,6 @@
 	  <Resource Include="Resources\QueryIcon.png" />
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="&quot;E:\CODE\ForguncyPluginBuilder\bin\ForguncyPluginPackageTool.exe&quot; $(ProjectDir) &quot;C:\Program Files\Forguncy 8&quot; " />
+		<Exec Command="&quot;E:\CODE\ForguncyPluginBuilder_8.0\bin\ForguncyPluginPackageTool.exe&quot; $(ProjectDir) &quot;C:\Program Files\Forguncy 8&quot; " />
 	</Target>
 </Project>

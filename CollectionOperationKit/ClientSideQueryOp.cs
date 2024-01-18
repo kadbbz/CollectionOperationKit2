@@ -50,6 +50,7 @@ namespace CollectionOperationKit
 
         [OrderWeight(103)]
         [DisplayName("点击设置查询条件")]
+        [Description("查询条件为AND关系，即所有条件全部满足才能返回；如需使用null作为查询条件，请留空或用%null%代替。")]
         [ListProperty]
         public List<QueryConditionObject> OperationParamaterPairs { get; set; }
 
