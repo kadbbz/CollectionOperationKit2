@@ -495,6 +495,25 @@ var ClientSideStringMapOp = (function (_super) {
                 this.returnToParam(OutParamaterName, Array.from(inP.values()));
                 break;
             }
+            case SupportedOperations.FromObject: {
+                if (!inP instanceof Object) {
+                    this.log("Paramater [" + params.InParamater + "] should be an Object.");
+                    return;
+                }
+
+                this.returnToParam(OutParamaterName, new Map(Object.entries(inP)));
+                break;
+            }
+            case SupportedOperations.ToObject: {
+                if (!inP instanceof Map) {
+                    this.log("Paramater [" + params.InParamater + "] should be a Map.");
+                    return;
+                }
+
+                this.returnToParam(OutParamaterName, Object.fromEntries(inP));
+                break;
+            }
+
 
         }
 
@@ -509,7 +528,9 @@ var ClientSideStringMapOp = (function (_super) {
         Clear: 5,
         Size: 6,
         Keys: 7,
-        Values: 8
+        Values: 8,
+        FromObject: 9,
+        ToObject:10
     }
 
     return ClientSideStringMapOp;

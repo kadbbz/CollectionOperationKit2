@@ -139,6 +139,14 @@ namespace CollectionOperationKit
                     {
                         return setPropertyVisiblity(propertyName, true, false, false);
                     }
+                case SupportedOperations.FromObject:
+                    {
+                        return setPropertyVisiblity(propertyName, true, false, false);
+                    }
+                case SupportedOperations.ToObject:
+                    {
+                        return setPropertyVisiblity(propertyName, true, false, false);
+                    }
                 default:
                     {
                         return base.GetDesignerPropertyVisible(propertyName, commandScope);
@@ -149,7 +157,7 @@ namespace CollectionOperationKit
 
         public enum SupportedOperations
         {
-            [Description("创建一个空的字典")]
+            [Description("创建一个空的字典（Map）")]
             Create,
             [Description("Get：返回【输入参数】中键为【键（文本型）】的值，如果找不到，则返回【值】的值")]
             Get,
@@ -166,7 +174,11 @@ namespace CollectionOperationKit
             [Description("Keys：返回【输入参数】中的所有键")]
             Keys,
             [Description("Values：返回【输入参数】中的所有值")]
-            Values
+            Values,
+            [Description("FromObject：将【输入参数】转换为字典，其中的属性转换为键值对")]
+            FromObject,
+            [Description("ToObject：将【输入参数】转换为对象，字典中的键值对转换为该对象的属性")]
+            ToObject
         }
     }
 }
