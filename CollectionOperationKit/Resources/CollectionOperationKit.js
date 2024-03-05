@@ -530,7 +530,7 @@ var ClientSideStringMapOp = (function (_super) {
         Keys: 7,
         Values: 8,
         FromObject: 9,
-        ToObject:10
+        ToObject: 10
     }
 
     return ClientSideStringMapOp;
@@ -703,50 +703,60 @@ var ClientSideQueryOp = (function (_super) {
 
                 switch (v.Op) {
                     case CalcOp.等于: {
-                        return (value == pValue || (value == null && pValue == "%null%"));
+                        if (!(value == pValue || (value == null && pValue == "%null%"))) return false;
+                        break;
                     }
                     case CalcOp.不等于: {
-                        return !(value == pValue || (value == null && pValue == "%null%"));
+                        if (value == pValue || (value == null && pValue == "%null%")) return false;
+                        break;
                     }
                     case CalcOp.包含字符串: {
                         if (typeof value == 'string') {
-                            return value.indexOf(pValue) >= 0;
+                            if (value.indexOf(pValue) == -1) return false;
+                            break;
                         } else {
                             return false;
                         }
                     }
                     case CalcOp.不包含字符串: {
                         if (typeof value == 'string') {
-                            return value.indexOf(pValue) == -1;
+                            if (value.indexOf(pValue) >= 0) return false;
+                            break;
                         } else {
                             return false;
                         }
                     }
                     case CalcOp.开头是: {
                         if (typeof value == 'string') {
-                            return value.indexOf(pValue) == 0;
+                            if (value.indexOf(pValue) != 0) return false;
+                            break;
                         } else {
                             return false;
                         }
                     }
                     case CalcOp.开头不是: {
                         if (typeof value == 'string') {
-                            return value.indexOf(pValue) != 0;
+                            if (value.indexOf(pValue) == 0) return false;
+                            break;
                         } else {
                             return false;
                         }
                     }
                     case CalcOp.大于: {
-                        return (value > pValue);
+                        if (!(value > pValue)) return false;
+                        break;
                     }
                     case CalcOp.不大于: {
-                        return !(value > pValue);
+                        if (value > pValue) return false;
+                        break;
                     }
                     case CalcOp.小于: {
-                        return (value < pValue);
+                        if (!(value < pValue)) return false;
+                        break;
                     }
                     case CalcOp.不小于: {
-                        return !(value < pValue);
+                        if (value < pValue) return false;
+                        break;
                     }
                 }
 

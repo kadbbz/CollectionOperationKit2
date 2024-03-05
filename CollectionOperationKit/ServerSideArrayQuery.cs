@@ -139,7 +139,7 @@ namespace CollectionOperationKit
         private bool checkWithConditions(IServerCommandExecuteContext dataContext, object candidate)
         {
 
-
+            // 判定条件采用AND关系
             foreach (QueryConditionObject qco in this.OperationParamaterPairs)
             {
                 var value = ServerSideHelpers.GetObjectProperty(candidate, getParamValue(dataContext, qco.Name).ToString());
@@ -153,16 +153,18 @@ namespace CollectionOperationKit
                     {
                         case CollectionOperationKit.Operation.等于:
                             {
-                                return condition == null || condition.ToString().ToLower() == NULL_MASK;
+                                if (condition != null && condition.ToString().ToLower() != NULL_MASK) return false;
+                                break;
                             }
                         case CollectionOperationKit.Operation.不等于:
                             {
-                                return !(condition == null || condition.ToString().ToLower() == NULL_MASK);
+                                if (condition == null || condition.ToString().ToLower() == NULL_MASK) return false;
+                                break;
                             }
                         default:
                             {
                                 //null仅支持判等，其他类型统一按照false处理。
-                                return false; 
+                                return false;
                             }
                     }
                 }
@@ -178,17 +180,23 @@ namespace CollectionOperationKit
                     {
                         case CollectionOperationKit.Operation.等于:
                             {
-                                return ServerSideHelpers.IsEqual(value, condition);
+                                if (!ServerSideHelpers.IsEqual(value, condition)) return false;
+                                break;
                             }
                         case CollectionOperationKit.Operation.不等于:
                             {
-                                return !ServerSideHelpers.IsEqual(value, condition);
+                                if (ServerSideHelpers.IsEqual(value, condition)) return false;
+                                break;
                             }
                         case CollectionOperationKit.Operation.包含字符串:
                             {
-                                if (value is string) {
-                                    return valueString.Contains(conditionString);
-                                } else {
+                                if (value is string)
+                                {
+                                    if (!valueString.Contains(conditionString)) return false;
+                                    break;
+                                }
+                                else
+                                {
                                     // 仅支持字符串
                                     return false;
                                 }
@@ -197,7 +205,8 @@ namespace CollectionOperationKit
                             {
                                 if (value is string)
                                 {
-                                    return !valueString.Contains(conditionString);
+                                    if (valueString.Contains(conditionString)) return false;
+                                    break;
                                 }
                                 else
                                 {
@@ -209,20 +218,22 @@ namespace CollectionOperationKit
                             {
                                 if (value is string)
                                 {
-                                    return valueString.StartsWith(conditionString);
+                                    if (!valueString.StartsWith(conditionString)) return false;
+                                    break;
                                 }
                                 else
                                 {
                                     // 仅支持字符串
                                     return false;
                                 }
-                                
+
                             }
                         case CollectionOperationKit.Operation.开头不是:
                             {
                                 if (value is string)
                                 {
-                                    return !valueString.StartsWith(conditionString);
+                                    if (valueString.StartsWith(conditionString)) return false;
+                                    break;
                                 }
                                 else
                                 {
@@ -236,16 +247,18 @@ namespace CollectionOperationKit
                                 {
                                     var v = double.Parse(value.ToString());
                                     var c = double.Parse(conditionString);
-                                    
-                                    return (v > c);
-                                    
+
+                                    if (v <= c) return false;
+                                    break;
+
                                 }
                                 else if (value is DateTime)
                                 {
                                     var v = DateTime.Parse(value.ToString());
                                     var c = DateTime.Parse(conditionString);
 
-                                    return (v > c);
+                                    if (v <= c) return false;
+                                    break;
                                 }
                                 else
                                 {
@@ -263,7 +276,8 @@ namespace CollectionOperationKit
                                     var v = double.Parse(value.ToString());
                                     var c = double.Parse(conditionString);
 
-                                    return (v <= c);
+                                    if (v > c) return false;
+                                    break;
 
                                 }
                                 else if (value is DateTime)
@@ -271,7 +285,8 @@ namespace CollectionOperationKit
                                     var v = DateTime.Parse(value.ToString());
                                     var c = DateTime.Parse(conditionString);
 
-                                    return (v <= c);
+                                    if (v > c) return false;
+                                    break;
                                 }
                                 else
                                 {
@@ -288,7 +303,8 @@ namespace CollectionOperationKit
                                     var v = double.Parse(value.ToString());
                                     var c = double.Parse(conditionString);
 
-                                    return (v < c);
+                                    if (v >= c) return false;
+                                    break;
 
                                 }
                                 else if (value is DateTime)
@@ -296,7 +312,8 @@ namespace CollectionOperationKit
                                     var v = DateTime.Parse(value.ToString());
                                     var c = DateTime.Parse(conditionString);
 
-                                    return (v < c);
+                                    if (v >= c) return false;
+                                    break;
                                 }
                                 else
                                 {
@@ -313,7 +330,8 @@ namespace CollectionOperationKit
                                     var v = double.Parse(value.ToString());
                                     var c = double.Parse(conditionString);
 
-                                    return (v >= c);
+                                    if (v < c) return false;
+                                    break;
 
                                 }
                                 else if (value is DateTime)
@@ -321,7 +339,8 @@ namespace CollectionOperationKit
                                     var v = DateTime.Parse(value.ToString());
                                     var c = DateTime.Parse(conditionString);
 
-                                    return (v >= c);
+                                    if (v < c) return false;
+                                    break;
                                 }
                                 else
                                 {
@@ -338,6 +357,7 @@ namespace CollectionOperationKit
                     return false;
                 }
             }
+
 
             return true;
         }
