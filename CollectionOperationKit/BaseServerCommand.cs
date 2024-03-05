@@ -29,11 +29,11 @@ namespace CollectionOperationKit
         }
 
 
-        protected object getParamValue(IServerCommandExecuteContext dataContext, object formula, bool shouldCheckNull = true)
+        protected object getParamValue(IServerCommandExecuteContext dataContext, object formula, bool shouldCheckFormulaNull = true)
         {
             if (formula == null)
             {
-                if (shouldCheckNull)
+                if (shouldCheckFormulaNull)
                 {
                     throw new ArgumentException("The parameter/formula was not set.");
                 }
@@ -45,18 +45,6 @@ namespace CollectionOperationKit
 
             var task = dataContext.EvaluateFormulaAsync(formula);
             task.Wait();
-
-            if (task.Result == null)
-            {
-                if (shouldCheckNull)
-                {
-                    throw new ArgumentException("[" + formula.ToString() + "] is null.");
-                }
-                else
-                {
-                    return null;
-                }
-            }
 
             return task.Result;
         }

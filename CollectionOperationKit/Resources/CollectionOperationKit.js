@@ -328,14 +328,17 @@
 
                     inP.map(function (obj) {
 
-                        var key = "objectUndefinedOrNull";
+                        var key;
 
                         if (obj) {
-                            key = obj[paramA];
-                            if (!obj[paramA]) {
-                                key = "propertyUndefinedOrNull";
+                            var prop = obj[paramA];
+
+                            if (prop === undefined) {
+                                key = "propertyUndefined";
+                            } else if (prop === null) {
+                                key = "propertyNull";
                             } else {
-                                key = JSON.stringify(obj[paramA]);
+                                key = JSON.stringify(prop);
                             }
                         }
 
@@ -347,17 +350,20 @@
 
                 } else {
 
-                    
 
                     inP.map(function (obj) {
 
-                        var key = "objectUndefinedOrNull";
+                        var key;
 
-                        if (obj) {
+                        if (obj === undefined) {
+                            key = "objectUndefined";
+                        } else if (obj === null) {
+                            key = "objectNull";
+                        } else {
                             key = JSON.stringify(obj);
                         }
 
-                        if (obj && taken.indexOf(key) < 0) {
+                        if (taken.indexOf(key) < 0) {
                             taken.push(key);
                             values.push(obj);
                         }
