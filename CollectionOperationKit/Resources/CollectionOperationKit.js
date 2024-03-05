@@ -324,20 +324,41 @@
                 var taken = [];
                 var values = [];
 
-                if (!paramA) {
+                if (paramA) {
 
                     inP.map(function (obj) {
-                        if (obj && obj[paramA] && taken.indexOf(obj[paramA]) < 0) {
-                            taken.push(obj[paramA]);
+
+                        var key = "objectUndefinedOrNull";
+
+                        if (obj) {
+                            key = obj[paramA];
+                            if (!obj[paramA]) {
+                                key = "propertyUndefinedOrNull";
+                            } else {
+                                key = JSON.stringify(obj[paramA]);
+                            }
+                        }
+
+                        if (taken.indexOf(key) < 0) {
+                            taken.push(key);
                             values.push(obj);
                         }
                     });
 
                 } else {
 
+                    
+
                     inP.map(function (obj) {
-                        if (obj && taken.indexOf(JSON.stringify(obj)) < 0) {
-                            taken.push(JSON.stringify(obj));
+
+                        var key = "objectUndefinedOrNull";
+
+                        if (obj) {
+                            key = JSON.stringify(obj);
+                        }
+
+                        if (obj && taken.indexOf(key) < 0) {
+                            taken.push(key);
                             values.push(obj);
                         }
                     });
