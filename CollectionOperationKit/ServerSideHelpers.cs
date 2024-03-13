@@ -62,6 +62,11 @@ namespace CollectionOperationKit
 
         public static object GetObjectProperty(object input, string name)
         {
+            if (string.IsNullOrWhiteSpace(name) || name.ToLower() == "%value%")
+            {
+                return input;
+            }
+
             if (input is IDictionary<string, object> dic)
             {
                 if (dic.ContainsKey(name))
@@ -103,7 +108,8 @@ namespace CollectionOperationKit
 
         }
 
-        public static bool IsEqual(object xp, object yp) {
+        public static bool IsEqual(object xp, object yp)
+        {
             if (xp is string || xp is int || xp is double || xp is float || xp is long || xp is short || xp is DateTime)
             {
                 // 优先用字符串判等

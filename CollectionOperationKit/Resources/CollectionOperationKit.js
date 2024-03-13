@@ -726,7 +726,7 @@ var ClientSideQueryOp = (function (_super) {
                 var pName = me.evaluateFormula(v.Name);
                 var pValue = me.evaluateFormula(v.Value);
 
-                var value = target[pName];
+                var value = (!pName || pName.toLowerCase() === "%value%") ? target : target[pName];
 
                 switch (v.Op) {
                     case CalcOp.等于: {
