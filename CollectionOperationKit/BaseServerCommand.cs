@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,25 +64,32 @@ namespace CollectionOperationKit
             {
                 throw new ArgumentException("[" + formula.ToString() + "] is null.");
             }
-            if (rawData.GetType() == typeof(ArrayList))
+            if (rawData is ArrayList trycast) // 本插件生成的，直接使用
             {
-                data = (ArrayList)rawData;
+                data = trycast;
             }
-            else if (rawData.GetType().IsArray) // 其他数组操作相关插件或返回值为各种数组的类型
+            else if (rawData is Array trycast1) // 其他数组操作相关插件或返回值为各种数组的类型
             {
-                data.AddRange((Array)rawData);
+                data.AddRange(trycast1);
             }
-            else if (rawData.GetType() == typeof(JArray)) // 从JSON序列化过来的数组
+            else if (rawData is JArray trycast2) // 从JSON序列化过来的数组
             {
-                data.AddRange(((JArray)rawData).ToArray());
+                data.AddRange(trycast2.ToArray());
             }
-            else if (rawData.GetType() == typeof(List<Dictionary<string, object>>)) // 设置变量命令从数据库中查询出的多行数据
+            else if (rawData is List<object> trycast3) // 设置变量命令从数据库中查询出的多行数据
             {
-                data.AddRange(((List<Dictionary<string, object>>)rawData).ToArray());
+                data.AddRange(trycast3.ToArray());
+            }
+            else if (rawData is IEnumerable trycast99) // 其他列表与集合类型的对象，遍历后添加到返回值
+            {
+                foreach (object obj in trycast99)
+                {
+                    data.Add(obj);
+                }
             }
             else
             {
-                throw new ArgumentException("[" + formula.ToString() + "]'s type was " + rawData.GetType().ToString() + ", should be an ArrayList， Array or JArray.");
+                throw new ArgumentException("[" + formula.ToString() + "]'s type was " + rawData.GetType().ToString() + ", should be an ArrayList, Array, List<object>, IEnumerable or JArray.");
             }
 
             return data;

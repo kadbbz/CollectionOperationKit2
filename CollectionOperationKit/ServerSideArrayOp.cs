@@ -55,40 +55,9 @@ namespace CollectionOperationKit
             {
                 case SupportedOperations.FromArray:
                     {
-                        var al = new ArrayList();
-                        var rawData = getParamValue(dataContext, this.OperationParamaterAName);
-                        if (rawData != null)
-                        {
-                            if (rawData.GetType() == typeof(Array))
-                            {
-                                al.AddRange((Array)rawData);
-                            }
-                            else if (rawData.GetType() == typeof(JArray))
-                            {
-                                al.AddRange(((JArray)rawData).ToArray());
-                            }
-                            else
-                            {
-                                // 如果可以转，就用循环处理
-                                if (rawData is IEnumerable trycast)
-                                {
-                                    foreach (object obj in trycast)
-                                    {
-                                        al.Add(obj);
-                                    }
-                                }
-                                else
-                                {
+                        var data = getArrayListParam(dataContext, this.OperationParamaterAName);
 
-                                    // 不行的话，直接抛出异常
-                                    throw new ArgumentException("[" + this.OperationParamaterAName + "]'s type was " + rawData.GetType().ToString() + ", should be an Array, IEnumerable or JArray.");
-                                }
-
-                            }
-                        }
-
-                        dataContext.Parameters[OutParamaterName] = al;
-
+                        returnToParam(dataContext, data);
                         break;
                     }
                 case SupportedOperations.ToArray:
@@ -171,7 +140,8 @@ namespace CollectionOperationKit
                         ArrayList data = getArrayListParam(dataContext, this.InParamater);
                         int start = int.Parse(getParamValue(dataContext, this.OperationParamaterAName).ToString());
                         int end = int.Parse(getParamValue(dataContext, this.OperationParamaterBName).ToString());
-                        returnToParam(dataContext, data.GetRange(start, end - start));
+                        ArrayList result = new ArrayList(data.GetRange(start, end - start)); // 必须创建新的ArrayList，否则原对象发生后，操作GetRange出来的新ArrayList会报错。
+                        returnToParam(dataContext, result);
                         break;
                     }
                 case SupportedOperations.InsertRange:
@@ -189,7 +159,7 @@ namespace CollectionOperationKit
                         int index = int.Parse(getParamValue(dataContext, this.OperationParamaterAName).ToString());
                         int count = int.Parse(getParamValue(dataContext, this.OperationParamaterBName).ToString());
 
-                        Array sub = data.GetRange(index, count).ToArray();
+                        ArrayList sub = new ArrayList(data.GetRange(index, count)); // 保存那些被删除的对象
                         data.RemoveRange(index, count);
 
                         returnToParam(dataContext, sub);
