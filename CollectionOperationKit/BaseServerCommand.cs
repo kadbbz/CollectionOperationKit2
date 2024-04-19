@@ -64,7 +64,7 @@ namespace CollectionOperationKit
             {
                 data = new ArrayList(); //简化判断 参数为Null时返回空数组
             }
-            if (rawData is ArrayList trycast) // 本插件生成的，直接使用
+            else if (rawData is ArrayList trycast) // 本插件生成的，直接使用
             {
                 data = trycast;
             }
