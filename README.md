@@ -1,3 +1,5 @@
+# 本项目已迁移至Gitee
+https://gitee.com/low-code-dev-lab/collection-operation-kit
 # CollectionOperationKit2
 活字格低代码开发平台插件：对象与集合操作工具
 
